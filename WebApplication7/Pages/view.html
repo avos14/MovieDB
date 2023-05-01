@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+    <link href="StyleSheet.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="../Scripts/AjaxCalls.js"></script>
+    <script>
+        $(document).ready(function () {
+            getSeries();
+
+        });
+
+        function getSeries() {
+            storedUser = JSON.parse(localStorage.user);
+            let api = "../api/Series?id=" + storedUser.UserId;
+            ajaxCall("GET", api, "", getSeriesSuccessCB, getSeriesErrorCB)
+        }
+
+        function getSeriesSuccessCB(series) {
+            console.log(series)
+            html_drop_select_element = "<select name=\"series\" id=\"series\" onchange=\"select_series()\" >";
+            html_drop_select_element += "<option disabled selected value> -- Select a TV show -- </option>"
+            for (let i = 0; i < series.length; i++) {
+                html_drop_select_element += "<option value = '" + series[i] + "'>" + series[i] + "</option>";
+            }
+            html_drop_select_element += "</select>";
+            $("#seriesDS").html(html_drop_select_element);
+        }
+
+        function select_series() {
+            let s = $("#series").val();
+            let api = "../api/Episodes?series=" + s + "&id=" + storedUser.UserId;
+            ajaxCall("GET", api, "", getEpisodesSuccessCB, getEpisodesErrorCB)
+
+        }
+
+        function getEpisodesSuccessCB(episodes) {
+            console.log(episodes);
+
+            episode_html = "";
+            for (let i = 0; i < episodes.length; i++) {
+                episode = episodes[i];
+                episode_html += "<div style=\"border: solid;\">";
+                episode_html += "Season " + episode["SeasonNum"] + " - Episode Name: " + episode["EpisodeName"] + "<br>";
+                episode_html += episode["EpisodeOverview"] + "<br>";
+                episode_html += "<image src=" + episode["EpisodeImg"] + "><br>";
+                episode_html += "Air date: " + episode["EpisodeAirdate"] + "<br>";
+                episode_html += "</div>";
+            }
+            $("#episodes").html(episode_html);
+        }
+
+        function getSeriesErrorCB(err) {
+            console.log(err);
+        }
+        function getEpisodesErrorCB(err) {
+            console.log(err);
+        }
+    </script>
+
+
+</head>
+<body>
+    <div class="container">
+        <button id="return" onclick="document.location = 'index.html'">Return</button>
+        <div>
+
+            <h1>Selected Episodes</h1>
+            <p style="font-size:16px;">Please select a TV show:</p>
+        </div>
+        <div id="seriesDS"></div>
+        <div id="episodes"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="StyleSheet.css" rel="stylesheet" />
+    <script src="../Scripts/AjaxCalls.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            getUsers();
+            getSeries();
+            getEpisodes();
+            $("#usersDT").hide();
+            $("#seriesDT").hide();
+            $("#episodesDT").hide();
+        });
+
+        function getEpisodes() {
+            let api = "../api/Episodes";
+            ajaxCall("GET", api, "", getEpisodeSucceessCB, getEpisodeErrorCB)
+        }
+        function getEpisodeSucceessCB(episodes) {
+            console.log(episodes);
+            episodesList = episodes;
+            try {
+                tbl = $('#episodesTable').DataTable({
+                    data: episodesList,
+                    pageLength: 5,
+                    columns: [
+                        { data: "EpisodeID" },
+                        { data: "SeriesName" },
+                        { data: "EpisodeName" },
+                        { data: "EpisodeAirdate" },
+                        {
+                            data: "SeasonNum",
+                            render: function (data, type, row, meta) {
+                                return "Season " + data;
+                            }
+                        },
+                        { data: "FavCount" },
+                    ],
+                });
+
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function getEpisodeErrorCB(err) {
+            console.log(err);
+        }
+        function getSeries() {
+            let api = "../api/Series";
+            ajaxCall("GET", api, "", getSeriesSuccessCB, getSeriesErrorCB)
+        }
+        function getSeriesSuccessCB(series) {
+            console.log(series);
+            seriesList = series;
+            try {
+                tbl = $('#seriesTable').DataTable({
+                    data: seriesList,
+                    pageLength: 5,
+                    columns: [
+                        { data: "Id" },
+                        { data: "Name" },
+                        { data: "Origin_country" },
+                        { data: "Original_language" },
+                        { data: "Popularity"},
+                        { data: "FavCount" },
+                    ],
+                });
+
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function getSeriesErrorCB(err) {
+            console.log(err);
+        }
+        function getUsers() {
+            let api = "../api/Users";
+            ajaxCall("GET", api, "", getUserSuccessCB, getUsersErrorCB)
+        }
+        function getUserSuccessCB(users) {
+            console.log(users)
+            usersList = users;
+            try {
+                tbl = $('#usersTable').DataTable({
+                    data: usersList,
+                    pageLength: 5,
+                    columns: [
+                        { data: "UserId" },
+                        { data: "Fname" },
+                        { data: "Lname" },
+                        { data: "Email" },
+                        { data: "Pnumber" },
+                        { data: "Gender" },
+                        { data: "Address" },
+                        { data: "IsAdmin" },
+                    ],
+                });
+
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function getUsersErrorCB(err) {
+            console.log(err);
+        }
+        function toggleUsers() {
+            var x = document.getElementById("usersDT");
+            if (x.style.display === "none") {
+                hideTables();
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+        function toggleSeries() {
+            var x = document.getElementById("seriesDT");
+            if (x.style.display === "none") {
+                hideTables();
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+        function toggleEpisodes() {
+            var x = document.getElementById("episodesDT");
+            if (x.style.display === "none") {
+                hideTables();
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+        function hideTables() {
+            $("#usersDT").hide();
+            $("#seriesDT").hide();
+            $("#episodesDT").hide();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 id="welcome">Admin Panel</h1>
+        <button id="return" onclick="document.location = 'index.html'">Return</button>
+        <button id="showUsers" onclick="toggleUsers()">Show Users</button>
+        <button id="showSeries" onclick="toggleSeries()">Show Series</button>
+        <button id="showEpisodes" onclick="toggleEpisodes()">Show Episodes</button>
+
+        <div id="usersDT">
+            <table id="usersTable" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Gender</th>
+                        <th>Address</th>
+                        <th>Is Admin?</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div id="seriesDT">
+            <table id="seriesTable" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Series ID</th>
+                        <th>Series Name</th>
+                        <th>Origin Country</th>
+                        <th>Original Language</th>
+                        <th>Popularity</th>
+                        <th>Favorited Count</th>
+                    </tr>
+                </thead>
+            </table>
+
+
+        </div>
+
+        <div id="episodesDT">
+            <table id="episodesTable" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Episode ID</th>
+                        <th>Series Name</th>
+                        <th>Episode Name</th>
+                        <th>Episode Airdate</th>
+                        <th>Season</th>
+                        <th>Favorited Count</th>
+                    </tr>
+                </thead>
+            </table>
+
+
+        </div>
+
+    </div>
+
+</body>
+</html>
